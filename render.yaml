@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: python app/start_wellness_api.py
+    startCommand: python app/production_start.py
     envVars:
       - key: PORT
         value: 8000

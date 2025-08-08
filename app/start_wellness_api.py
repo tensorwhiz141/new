@@ -115,32 +115,30 @@ def main():
     if not check_requirements():
         return
 
-    # For production (Render), skip .env file check as env vars are set directly
-    environment = os.getenv("ENVIRONMENT", "development")
-    if environment == "production":
-        print("✓ Running in production mode")
-        # Check for at least one API key (Gemini or Groq)
-        gemini_key = os.getenv("GEMINI_API_KEY")
-        groq_key = os.getenv("GROQ_API_KEY")
+    # Check for API keys (works for both development and production)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    groq_key = os.getenv("GROQ_API_KEY")
 
-        if not gemini_key and not groq_key:
-            print("✗ Missing API keys: Need either GEMINI_API_KEY or GROQ_API_KEY")
-            print("Available environment variables:")
-            for key, value in os.environ.items():
-                if 'API' in key.upper():
-                    print(f"  {key}={'*' * len(value) if value else 'not set'}")
-            return
-        else:
-            if gemini_key:
-                print("✓ Gemini API key found")
-            if groq_key:
-                print("✓ Groq API key found")
-            print("✓ API configuration ready")
+    print(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+
+    if not gemini_key and not groq_key:
+        print("✗ No API keys found!")
+        print("Need either GEMINI_API_KEY or GROQ_API_KEY")
+        print("\nFor Render deployment:")
+        print("  Set environment variables in Render dashboard")
+        print("\nFor local development:")
+        print("  Add API keys to .env file")
+        print("\nAvailable environment variables:")
+        for key, value in os.environ.items():
+            if 'API' in key.upper() or 'KEY' in key.upper():
+                print(f"  {key}={'*' * min(len(value), 10) if value else 'not set'}")
+        return
     else:
-        # Check environment file for development
-        if not check_env_file():
-            print("\nPlease configure your .env file with valid API keys and run again.")
-            return
+        if gemini_key:
+            print("✓ Gemini API key found")
+        if groq_key:
+            print("✓ Groq API key found")
+        print("✓ API configuration ready")
 
     # Start the API
     start_api_server()
