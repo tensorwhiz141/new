@@ -119,12 +119,23 @@ def main():
     environment = os.getenv("ENVIRONMENT", "development")
     if environment == "production":
         print("✓ Running in production mode")
-        # Check for required environment variables
-        required_vars = ["GEMINI_API_KEY"]
-        missing_vars = [var for var in required_vars if not os.getenv(var)]
-        if missing_vars:
-            print(f"✗ Missing required environment variables: {missing_vars}")
+        # Check for at least one API key (Gemini or Groq)
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        groq_key = os.getenv("GROQ_API_KEY")
+
+        if not gemini_key and not groq_key:
+            print("✗ Missing API keys: Need either GEMINI_API_KEY or GROQ_API_KEY")
+            print("Available environment variables:")
+            for key, value in os.environ.items():
+                if 'API' in key.upper():
+                    print(f"  {key}={'*' * len(value) if value else 'not set'}")
             return
+        else:
+            if gemini_key:
+                print("✓ Gemini API key found")
+            if groq_key:
+                print("✓ Groq API key found")
+            print("✓ API configuration ready")
     else:
         # Check environment file for development
         if not check_env_file():
